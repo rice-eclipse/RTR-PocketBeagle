@@ -9,7 +9,7 @@ def little_endian_add(bytes):
     """
     output = 0
     for i in range(len(bytes)):
-            output += bytes[i] * (2**(len(bytes)-i-1))
+            output += bytes[i]  << (len(bytes)-i-1)
     return output
     
 class Altimeter:
@@ -89,7 +89,7 @@ class Altimeter:
         self._i2c.unlock()#free the i2c
         return little_endian_add(output_buffer)
         
-    def read_data(self, command):
+    def read_raw(self, command):
         """
         Read a raw data value off of the altimeter.
         """
@@ -98,6 +98,7 @@ class Altimeter:
             pass
         
         self._i2c.writeto(address = self._address, buffer=bytearray([command]))
+        time.sleep(0.01)#have to wait for conversion to be complete
         self._i2c.writeto(
             address = self._address, 
             buffer = bytearray([self._adc_command]))
@@ -111,11 +112,14 @@ class Altimeter:
         Get data off of the altimeter! 
         Returns a mapping {"temp": tempval, "pressure": pressure}
         """
-        d1 = self.read_data(self._convert_d1_4096)
-        d2 = self.read_data(self._convert_d2_4096)
+        d1 = self.read_raw(self._convert_d1_4096)
+        print("D1 is", d1)
+        d2 = self.read_raw(self._convert_d2_4096)
+        print("D2 is", d2)
         
-        t_ref = self._c[5] << 8#calibration reference temp
-        d_t = d2 - t_ref #temperature offset from reference
+        
+        d_t = d2 - (self._c[5] << 8) #temperature offset from reference
+        print("DT is", d_t)
         
         int_temp = ((d_t * self._c[6]) >> 23) + 2000
         temp = float(int_temp) / 100
