@@ -3,13 +3,13 @@ import time
 import board
 import array
 
-def little_endian_add(bytes):
+def big_endian_add(bytes):
     """
-    Add an array of bytes into an int the little-endian way.
+    Add an array of bytes into an int the big-endian way.
     """
     output = 0
     for i in range(len(bytes)):
-            output += bytes[i]  << (len(bytes)-i-1)
+            output += bytes[i]  << 8*(len(bytes)-i-1)
     return output
     
 class Altimeter:
@@ -30,7 +30,7 @@ class Altimeter:
             0,
             0
             ]
-        self._address = 0x76 #Hardware address on the altimeter. 0x76 for hi CS
+        self._address = 0x77 #Hardware address on the altimeter. 0x76 for hi CS
         #and 0x77 for low CS
         self._prom_commands = [
             0xA0,
@@ -51,10 +51,10 @@ class Altimeter:
         """
         Initialize the altimeter. Called once at the start of using this altimeter.
         """
-        print("Resetting device")
-        self.reset()
         print("Scanning devices")
         print(self._i2c.scan())
+        print("Resetting device")
+        self.reset()
         print("Reading PROM")
         self.update_prom()
         print("PROM is", self._c)
@@ -87,7 +87,7 @@ class Altimeter:
         output_buffer = bytearray(2)
         self._i2c.readfrom_into(address = self._address, buffer = output_buffer)
         self._i2c.unlock()#free the i2c
-        return little_endian_add(output_buffer)
+        return big_endian_add(output_buffer)
         
     def read_raw(self, command):
         """
@@ -105,7 +105,7 @@ class Altimeter:
         output_buffer = bytearray(3)
         self._i2c.readfrom_into(address = self._address, buffer = output_buffer)
         self._i2c.unlock()#free the i2c
-        return little_endian_add(output_buffer)
+        return big_endian_add(output_buffer)
         
     def get_data(self):
         """
@@ -141,7 +141,7 @@ class Altimeter:
         
         
         
-        
+       
 alt = Altimeter()
 alt.initialize()
 print(alt.get_data())
