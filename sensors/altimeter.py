@@ -5,7 +5,7 @@ import array
 
 def big_endian_add(bytes):
     """
-    Add an array of bytes into an int the big-endian way.
+    Add an array of bytes into an int the little-endian way.
     """
     output = 0
     for i in range(len(bytes)):
@@ -30,7 +30,7 @@ class Altimeter:
             0,
             0
             ]
-        self._address = 0x77 #Hardware address on the altimeter. 0x76 for hi CS
+        self._address = 0x76 #Hardware address on the altimeter. 0x76 for hi CS
         #and 0x77 for low CS
         self._prom_commands = [
             0xA0,
@@ -51,10 +51,10 @@ class Altimeter:
         """
         Initialize the altimeter. Called once at the start of using this altimeter.
         """
-        print("Scanning devices")
-        print(self._i2c.scan())
         print("Resetting device")
         self.reset()
+        print("Scanning devices")
+        print(self._i2c.scan())
         print("Reading PROM")
         self.update_prom()
         print("PROM is", self._c)

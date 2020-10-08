@@ -14,7 +14,7 @@ serB.close()
 serB.open()
 serA.open()
 
-my_messages = ["what\r", "is\n", "love?\n"]
+my_messages = ["what\n", "is\n", "love?\n"]
 
 for i in range(len(my_messages)):
     serA.write(my_messages[i].encode('ascii'))
@@ -22,7 +22,7 @@ for i in range(len(my_messages)):
     print("Trying to check if serial is open")
     if serB.isOpen():
         print("Serial is open")
-    if serB.in_waiting:
+    if serB.in_waiting > 0:
         print("Serial is waiting")
     if serB.isOpen() and serB.in_waiting > 0:
         line = serB.readline().decode('ascii')
