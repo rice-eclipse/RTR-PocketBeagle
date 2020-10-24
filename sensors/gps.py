@@ -3,7 +3,11 @@ import serial
 import pynmea2
 import time
 import Adafruit_BBIO.GPIO as GPIO
+import os
 
+permission_command = "sudo chmod 777 /dev/ttyO0"
+sudoPassword = "temppwd"
+os.system('echo %s|sudo -S %s' % (sudoPassword, permission_command))
 
 UART.setup("PB-UART0")
 
